@@ -3,6 +3,12 @@
 Arabic-only Small Language Model (SLM) by [TokenAI](https://tokenai.llc/), owned
 and developed by **Assem Sabry**.
 
+TokenAI is a startup and nonprofit organization focused on open Arabic AI
+research and model development.
+
+- GitHub repository: [tokenaii/Horus-Taleeq-0.2B](https://github.com/tokenaii/Horus-Taleeq-0.2B)
+- Hugging Face model: [tokenaii/Horus-Taleeq-0.2-base](https://huggingface.co/tokenaii/Horus-Taleeq-0.2-base)
+
 This repository contains the training code and reproducibility record for
 `Horus-Taleeq-0.2-base` only. It does not contain other model lines, chat
 adapters, teacher outputs, private data, or credentials.
