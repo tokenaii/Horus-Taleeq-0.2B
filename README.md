@@ -89,6 +89,11 @@ exclusion checks. See [DATA_SOURCES.md](docs/DATA_SOURCES.md) and
 The historical raw streams and later cleaned Parquet export are not identical, so
 this repository does not claim full corpus reproducibility from the public export.
 
+## Training compute profile
+
+See [COMPUTE_PROFILE.md](docs/COMPUTE_PROFILE.md) for the measured GPU, VRAM, CPU,
+cores, threads, and system RAM used during training.
+
 ## License
 
 The model and repository materials are released under the [MIT License](LICENSE).
