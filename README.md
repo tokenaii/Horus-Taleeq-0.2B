@@ -1,40 +1,95 @@
-# Horus Taleeq
+# Horus Taleeq 0.2 Base
 
-Arabic-first decoder-only language models by TokenAI. This repository contains the
-engineering and reproducibility documentation for the current Horus Taleeq 0.2B
-development line and the proposed Horus Taleeq 4B successor.
+Arabic-only Small Language Model (SLM) by [TokenAI](https://tokenai.llc/), owned
+and developed by **Assem Sabry**.
 
-## Current release status
+This repository contains the training code and reproducibility record for
+`Horus-Taleeq-0.2-base` only. It does not contain other model lines, chat
+adapters, teacher outputs, private data, or credentials.
 
-The 0.2B model is still a development checkpoint, not a public production
-conversation model. Its base pre-training reached **6,000,308,224 tokenizer IDs**.
-The 4,096-token context continuation and a clean-repair continuation are separate
-development checkpoints. SFT and identity tuning are staged but are not yet signed
-off by the evaluation gate.
+## Release boundary
 
-Read [the current model record](docs/CURRENT_MODEL.md) for exact architecture,
-data accounting, tokenizer, training settings, and known limitations. The successor
-plan is in [HORUS_TALEEQ_4B_PLAN.md](docs/HORUS_TALEEQ_4B_PLAN.md).
+This is a base-model development release, ready for continued pretraining,
+instruction tuning, and identity tuning. It is not a finished production chat
+model. The public record stops at base pretraining and its documented context and
+clean-repair continuations.
 
-## Important data statement
+The original base ledger contains **6,000,308,224 tokenizer IDs**:
 
-The raw training corpus and the cleaned Parquet export are not currently identical.
-The Parquet audit produced 1,302,502,948 tokenizer IDs after filtering, while the
-model's training ledger records 6,000,308,224 IDs from the raw training streams.
-No dataset or model should be described as a fully reproducible public release until
-one canonical, hashed manifest is published.
+- Initial pretraining: `3,616,305,152` IDs
+- Raw-data continuation: `2,384,003,072` IDs
+
+Core pretraining wall-clock time was **28 hours, 40 minutes, 20.604 seconds**.
+The separate 4K context and clean-repair continuations are documented separately
+and are not counted in that total.
+
+## Model configuration
+
+| Field | Value |
+| --- | --- |
+| Model type | Arabic-only SLM, decoder-only causal Transformer |
+| Parameters | approximately 204.6M |
+| Layers | 24 |
+| Hidden size | 640 |
+| Attention heads | 10 |
+| Key/value heads | 2 (GQA) |
+| MLP size | 2,048 |
+| Vocabulary | 128,000 SentencePiece tokens |
+| Context configuration | 4,096 tokens |
+| Initial pretraining sequence | 2,048 tokens |
+| Position encoding | RoPE, theta 1,000,000 |
+| Embeddings | tied input/output |
+| Training dtype | bfloat16 |
 
 ## Repository layout
 
 ```text
+configs/
+  horus_taleeq_0.2_base.yaml
 docs/
-  CURRENT_MODEL.md          Current 0.2B technical record and status
-  HORUS_TALEEQ_4B_PLAN.md   Proposed 4B architecture and training plan
-  DATA_AND_REPRODUCIBILITY.md  Data, licensing, filtering, and release gates
+  CURRENT_MODEL.md
+  TRAINING_STAGES.md
+  HARDWARE_AND_COST.md
+  DATA_SOURCES.md
+  DATA_AND_REPRODUCIBILITY.md
+scripts/
+  prepare_tokenizer_input.py
+  train_tokenizer.py
+  train_pretrain.py
+  train_canonical_clean.py
+  build_pretrain_parquet.py
+  collect_arabic_35b.py
+  collect_arabic_50b_multisource.py
+  collect_arabic_resume.py
 ```
 
-## License and data rights
+## Training stages
 
-Model and code licensing will be declared with the first public release. Every
-dataset shard must carry source, license, filtering, tokenizer, and SHA-256 metadata.
-Do not publish private, restricted, or unlicensed source material.
+1. Arabic-first SentencePiece tokenizer preparation and training.
+2. Initial pretraining at sequence length 2,048.
+3. Raw-data continuation to the 6.0B-token base ledger.
+4. Separate 4,096-token context continuation.
+5. Clean-repair continuation on filtered Arabic Parquet data.
+
+AdamW is the reproducibility baseline. STAM was investigated as a research
+alternative but was not used for the verified base ledger.
+
+## Data policy
+
+The pipeline is Arabic-only and applies Arabic-ratio checks, exact deduplication,
+boilerplate/HTML/SEO rejection, repeated-line filtering, and Quranic-content
+exclusion checks. See [DATA_SOURCES.md](docs/DATA_SOURCES.md) and
+[DATA_AND_REPRODUCIBILITY.md](docs/DATA_AND_REPRODUCIBILITY.md).
+
+The historical raw streams and later cleaned Parquet export are not identical, so
+this repository does not claim full corpus reproducibility from the public export.
+
+## Hardware
+
+The measured training host used an NVIDIA RTX PRO 6000 Blackwell Server Edition
+with 97,887 MiB VRAM, an Intel Xeon Platinum 8559C with 4 physical cores / 8
+logical CPUs, and 62 GiB system RAM. See [HARDWARE_AND_COST.md](docs/HARDWARE_AND_COST.md).
+
+## License
+
+The model and repository materials are released under the [MIT License](LICENSE).
