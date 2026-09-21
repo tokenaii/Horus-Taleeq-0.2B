@@ -12,7 +12,7 @@ alignment artifacts are excluded.
 | **Core total** | **6,000,308,224** | — | **28:40:20.604** |
 
 Durations are measured from training-log creation to the terminal
-`training_complete` event on the AWS host in UTC.
+`training_complete` event on the training host in UTC.
 
 ## Post-pretraining continuations
 

@@ -49,7 +49,6 @@ configs/
 docs/
   CURRENT_MODEL.md
   TRAINING_STAGES.md
-  HARDWARE_AND_COST.md
   DATA_SOURCES.md
   DATA_AND_REPRODUCIBILITY.md
 scripts/
@@ -85,10 +84,6 @@ The historical raw streams and later cleaned Parquet export are not identical, s
 this repository does not claim full corpus reproducibility from the public export.
 
 ## Hardware
-
-The measured training host used an NVIDIA RTX PRO 6000 Blackwell Server Edition
-with 97,887 MiB VRAM, an Intel Xeon Platinum 8559C with 4 physical cores / 8
-logical CPUs, and 62 GiB system RAM. See [HARDWARE_AND_COST.md](docs/HARDWARE_AND_COST.md).
 
 ## License
 
