@@ -83,8 +83,6 @@ exclusion checks. See [DATA_SOURCES.md](docs/DATA_SOURCES.md) and
 The historical raw streams and later cleaned Parquet export are not identical, so
 this repository does not claim full corpus reproducibility from the public export.
 
-## Hardware
-
 ## License
 
 The model and repository materials are released under the [MIT License](LICENSE).
