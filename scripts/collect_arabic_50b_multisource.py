@@ -64,7 +64,20 @@ def main():
     db.execute('CREATE TABLE IF NOT EXISTS seen (h BLOB PRIMARY KEY)'); db.commit()
     sp=spm.SentencePieceProcessor(model_file=str(TOK))
     schema=pa.schema([('text',pa.string()),('source',pa.string()),('source_type',pa.string()),('url',pa.string()),('token_count',pa.int32())])
-    rows=[]; total=0; accepted=0; rejected=0; shard=0; started=time.time()
+    # Resume safely when the collector is restarted. The prior implementation
+    # always started at part-00000 and could overwrite already collected shards.
+    existing_shards=sorted(OUT.glob('part-*.parquet'))
+    shard=(max((int(p.stem.split('-')[-1]) for p in existing_shards), default=-1) + 1)
+    total=0
+    if existing_shards:
+        for p in existing_shards:
+            try:
+                pf=pq.ParquetFile(str(p))
+                total += sum(int(x) for x in pf.read(columns=['token_count']).column('token_count').to_pylist())
+            except Exception:
+                pass
+    accepted=0; rejected=0; started=time.time()
+    print(json.dumps({'event':'resume_state','existing_shards':len(existing_shards),'existing_tokens':total,'next_shard':shard,'target':TARGET},ensure_ascii=False),flush=True)
     for repo,config,stype in SOURCES:
         print(json.dumps({'event':'source_start','repo':repo,'config':config,'source_type':stype},ensure_ascii=False),flush=True)
         try:
