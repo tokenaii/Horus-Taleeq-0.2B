@@ -18,6 +18,11 @@ BOILER=re.compile(r'حقوق الطبع|جميع الحقوق محفوظة|اض�
 URL=re.compile(r'https?://|www\.',re.I)
 
 SOURCES=[
+ ('SultanR/fineweb-edu-arabic','default','translated'),
+ ('Misraj/mudd','default','translated'),
+ ('PleIAs/Arabic-PD','default','original'),
+ ('fr3on/arabic-dialect-corpus','default','dialect'),
+ ('ArabicNLPWorld/arabic-nlp-corpus','default','original'),
  ('ClusterlabAi/101_billion_arabic_words_dataset','default','original'),
  ('lightonai/ArabicWeb24','default','original'),
  ('oscar-corpus/mOSCAR','arb_Arab','original'),
@@ -49,7 +54,7 @@ def good(text):
     return text
 
 def extract(row):
-    text=to_text(row.get('text',''))
+    text=to_text(row.get('text','') or row.get('plain_text','') or row.get('content',''))
     url=row.get('url','')
     if not isinstance(url,str): url=''
     if not url:
@@ -64,6 +69,7 @@ def main():
     db.execute('CREATE TABLE IF NOT EXISTS seen (h BLOB PRIMARY KEY)'); db.commit()
     sp=spm.SentencePieceProcessor(model_file=str(TOK))
     schema=pa.schema([('text',pa.string()),('source',pa.string()),('source_type',pa.string()),('url',pa.string()),('token_count',pa.int32())])
+    rows=[]
     # Resume safely when the collector is restarted. The prior implementation
     # always started at part-00000 and could overwrite already collected shards.
     existing_shards=sorted(OUT.glob('part-*.parquet'))
