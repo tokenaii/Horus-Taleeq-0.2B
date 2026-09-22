@@ -34,7 +34,7 @@ and are not counted in that total.
 | Field | Value |
 | --- | --- |
 | Model type | Arabic-only SLM, decoder-only causal Transformer |
-| Parameters | approximately 204.6M |
+| Parameters | exactly 199,916,160 (approximately 199.92M) |
 | Layers | 24 |
 | Hidden size | 640 |
 | Attention heads | 10 |

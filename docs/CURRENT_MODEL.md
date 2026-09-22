@@ -7,7 +7,7 @@ finished instruction/chat assistant.
 
 | Field | Value |
 | --- | ---: |
-| Parameters | approximately 204.6M |
+| Parameters | exactly 199,916,160 (approximately 199.92M) |
 | Architecture | Llama-style decoder-only causal Transformer |
 | Vocabulary | 128,000 SentencePiece tokens |
 | Hidden size | 640 |
