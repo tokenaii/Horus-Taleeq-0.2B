@@ -18,6 +18,10 @@ BOILER=re.compile(r'حقوق الطبع|جميع الحقوق محفوظة|اض�
 URL=re.compile(r'https?://|www\.',re.I)
 
 SOURCES=[
+ ('HuggingFaceFW/fineweb-2','arb_Arab','original'),
+ ('uonlp/CulturaX','ar','original'),
+ ('allenai/MADLAD-400','ar','original'),
+ ('MohamedRashad/arabic-billion-words','default','original'),
  ('SultanR/fineweb-edu-arabic','default','translated'),
  ('Misraj/mudd','default','translated'),
  ('PleIAs/Arabic-PD','default','original'),
@@ -94,14 +98,27 @@ def main():
             for row in ds:
                 text,url=extract(row); text=good(text)
                 if not text: rejected+=1; continue
+                n=len(sp.encode(text,out_type=int))
+                if n<16: rejected+=1; continue
+                remaining=TARGET-total
+                if remaining <= 0: break
+                if n > remaining:
+                    # Trim the final record so the tokenizer-token total is
+                    # exactly TARGET, then re-count after decoding.
+                    ids=sp.encode(text,out_type=int)[:remaining]
+                    text=sp.decode(ids)
+                    n=len(sp.encode(text,out_type=int))
+                    while n > remaining and len(ids) > 16:
+                        ids=ids[:-1]; text=sp.decode(ids); n=len(sp.encode(text,out_type=int))
+                    if n != remaining:
+                        print(json.dumps({'event':'final_trim_failed','remaining':remaining,'actual':n},ensure_ascii=False),flush=True)
+                        break
                 h=hashlib.sha256(text.encode()).digest()
                 try: db.execute('INSERT INTO seen(h) VALUES (?)',(h,))
                 except sqlite3.IntegrityError: rejected+=1; continue
-                n=len(sp.encode(text,out_type=int))
-                if n<16: rejected+=1; continue
                 rows.append({'text':text,'source':repo,'source_type':stype,'url':url,'token_count':n})
                 total+=n; accepted+=1
-                if len(rows)>=ROWS:
+                if len(rows)>=ROWS or total>=TARGET:
                     pq.write_table if False else None
                     fn=OUT/f'part-{shard:05d}.parquet'
                     pq.write_table(pa.Table.from_pylist(rows,schema=schema),str(fn),compression='zstd'); rows=[]; shard+=1
